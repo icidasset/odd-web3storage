@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es2022",
+    "lib": [
+      "dom",
+      "es2022",
+      "webworker"
+    ],
+    "strict": true,
+    "sourceMap": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "declarationDir": "lib",
+    "outDir": "lib"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "src/**/*.test.ts",
+    "tests/**/*"
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "target": "es2022",
+      "module": "es2022"
+    }
+  }
+}
