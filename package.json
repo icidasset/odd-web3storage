@@ -4,7 +4,6 @@
   "type": "module",
   "dependencies": {
     "@ipld/dag-ucan": "^3.4.0",
-    "@oddjs/odd": "file:../../Work/ts-odd",
     "@web3-storage/access": "^15.2.1",
     "@web3-storage/capabilities": "^9.3.0",
     "@web3-storage/did-mailto": "^2.0.0",
@@ -12,5 +11,8 @@
     "@web3-storage/w3up-client": "^8.0.3",
     "blockstore-level": "^1.1.4",
     "uint8arrays": "^4.0.6"
+  },
+  "peerDependencies": {
+    "@oddjs/odd": "icidasset/ts-odd#authority"
   }
 }
