@@ -37,7 +37,7 @@ export async function implementation(
       if (await blockstore.has(cid)) return blockstore.get(cid)
 
       // TODO: Can we use CAR files to get a bunch of blocks at once?
-      return fetch(`https://w3s.link/ipfs/${cid.toString()}?format=raw`)
+      return fetch(`https://${cid.toString()}.ipfs.w3s.link/?format=raw`)
         .then(r => {
           if (r.ok) return r.arrayBuffer()
           throw new Error("Failed to fetch block from gateway")
