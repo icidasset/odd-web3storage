@@ -104,7 +104,12 @@ export async function implementation(
         return block
       })
 
-      await storage.setItem("depot-tracker", Object.keys(DEPOT_TRACKER))
+      await storage.setItem(
+        "depot-tracker",
+        JSON.stringify(
+          Object.keys(DEPOT_TRACKER)
+        )
+      )
 
       // Build DAG to reference all blocks
       const dag = DagCBOR.encode(blocks.map(b => b.cid))
