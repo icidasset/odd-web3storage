@@ -6,7 +6,7 @@ import { CID } from "multiformats/cid"
 import { sha256 } from "multiformats/hashes/sha2"
 import { CAR, Store } from "@web3-storage/upload-client"
 import { Block } from "multiformats"
-import { Agent, Depot, Inventory, CodecIdentifier, Ticket } from "@oddjs/odd"
+import { Agent, Depot, Inventory, CodecIdentifier, Ticket, Storage, decodeCID } from "@oddjs/odd"
 
 import { agentSigner, config } from "../common.js"
 
@@ -17,14 +17,34 @@ import { agentSigner, config } from "../common.js"
 export type ImplementationOptions = {
   agent: Agent.Implementation
   blockstoreName: string
+  storage: Storage.Implementation
 }
 
 export async function implementation(
-  { agent, blockstoreName }: ImplementationOptions
+  { agent, blockstoreName, storage }: ImplementationOptions
 ): Promise<Depot.Implementation> {
   const blockstore = new LevelBlockstore(blockstoreName, { prefix: "" })
 
-  const DEPOT_TRACKER: Block[] = []
+  // Depot tracker
+  const dt = await storage.getItem("depot-tracker")
+
+  const DEPOT_TRACKER: Record<string, Block> = dt
+    ? await JSON.parse(dt as string).reduce(
+      async (acc: Promise<Record<string, Block>>, cid: string) => {
+        const decodedCID = decodeCID(cid)
+        return {
+          ...acc,
+          [cid]: await blockstore
+            .get(decodedCID)
+            .then(bytes => {
+              const block: Block = { bytes, cid: decodedCID.toV1() }
+              return block
+            })
+        }
+      },
+      {}
+    )
+    : {}
 
   // Implementation
   // --------------
@@ -59,8 +79,15 @@ export async function implementation(
 
       await blockstore.put(cid, data)
 
-      DEPOT_TRACKER.push(block)
+      // Depot tracker
+      DEPOT_TRACKER[cid.toString()] = block
 
+      await storage.setItem(
+        "depot-tracker",
+        JSON.stringify(Object.keys(DEPOT_TRACKER))
+      )
+
+      // Return
       return cid
     },
 
@@ -71,9 +98,13 @@ export async function implementation(
       if (!result.config) return
       const cfg = result.config
 
-      const blocks = DEPOT_TRACKER.slice(0)
+      const blocks = Object.keys(DEPOT_TRACKER).map(k => {
+        const block = DEPOT_TRACKER[k]
+        delete DEPOT_TRACKER[k]
+        return block
+      })
 
-      DEPOT_TRACKER.length = 0
+      await storage.setItem("depot-tracker", Object.keys(DEPOT_TRACKER))
 
       // Build DAG to reference all blocks
       const dag = DagCBOR.encode(blocks.map(b => b.cid))

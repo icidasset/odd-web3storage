@@ -39,7 +39,7 @@ export async function components(
   const identifierStore = Storage.implementation({ name: `${namespace}/identifier` })
 
   const agent = await Agent.implementation({ store: agentStore })
-  const depot = await Depot.implementation({ agent, blockstoreName: `${namespace}/blockstore` })
+  const depot = await Depot.implementation({ agent, storage, blockstoreName: `${namespace}/blockstore` })
 
   const clerk = Clerk.implementation()
   const dns = DNS.implementation()
