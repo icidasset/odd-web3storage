@@ -68,15 +68,30 @@ export async function volume<FS>(
     if (!result.config) throw new Error(result.error)
     const conf = result.config
 
-    // Remove old uploads
-    const { results } = await Upload.list(conf)
+    // Remove old uploads andadd data root as upload
+    try {
+      const { results } = await Upload.list(conf)
 
-    await Promise.all(
-      results.map(r => Upload.remove(conf, r.root))
-    )
+      await Promise.all(
+        results.map(r => Upload.remove(conf, r.root))
+      )
 
-    // Add data root as upload
-    await Upload.add(conf, dataRoot, [])
+      await Upload.add(conf, dataRoot, [])
+    } catch (error) {
+      console.error(error)
+      dependencies.manners.log("🔥 Failed to update DNSLink for:", dataRoot.toString())
+
+      const reason = typeof error === "string"
+        ? error
+        : error && typeof error === "object" && "message" in error && typeof error.message === "string"
+          ? error.message
+          : "unknown"
+
+      return { updated: false, reason }
+    }
+
+    // Log
+    dependencies.manners.log("🪴 DNSLink updated:", dataRoot.toString())
 
     // Fin
     return { updated: true }
