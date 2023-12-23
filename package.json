@@ -6,22 +6,13 @@
   "exports": {
     ".": "./lib/index.js",
     "./package.json": "./package.json",
-    "./*": [
-      "./lib/*.js",
-      "./lib/*",
-      "./lib/*/index.js",
-      "./*"
-    ]
+    "./*": ["./lib/*.js", "./lib/*", "./lib/*/index.js", "./*"]
   },
   "types": "lib/index.d.ts",
   "typesVersions": {
     "*": {
-      "lib/index.d.ts": [
-        "lib/index.d.ts"
-      ],
-      "*": [
-        "lib/*"
-      ]
+      "lib/index.d.ts": ["lib/index.d.ts"],
+      "*": ["lib/*"]
     }
   },
   "files": [
@@ -45,19 +36,19 @@
   },
   "dependencies": {
     "@ipld/dag-ucan": "^3.4.0",
-    "@web3-storage/access": "^15.2.1",
-    "@web3-storage/capabilities": "^9.3.0",
-    "@web3-storage/did-mailto": "^2.0.0",
-    "@web3-storage/upload-client": "^9.2.0",
-    "@web3-storage/w3up-client": "^8.0.3",
-    "blockstore-level": "^1.1.4",
+    "@web3-storage/access": "^18.1.0",
+    "@web3-storage/capabilities": "^13.0.0",
+    "@web3-storage/did-mailto": "^2.1.0",
+    "@web3-storage/upload-client": "^12.3.2",
+    "@web3-storage/w3up-client": "^11.2.1",
+    "blockstore-level": "^1.1.6",
     "interface-blockstore": "^5.2.7",
-    "uint8arrays": "^4.0.6"
+    "uint8arrays": "^5.0.0"
   },
   "peerDependencies": {
     "@oddjs/odd": "icidasset/ts-odd#nest"
   },
   "devDependencies": {
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   }
 }
