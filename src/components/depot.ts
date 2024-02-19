@@ -1,6 +1,6 @@
 import * as DagCBOR from "@ipld/dag-cbor";
 
-import { LevelBlockstore } from "blockstore-level";
+import { IDBBlockstore } from "blockstore-idb";
 import { CID } from "multiformats/cid";
 import { sha256 } from "multiformats/hashes/sha2";
 import { CAR, Store } from "@web3-storage/upload-client";
@@ -25,7 +25,7 @@ export async function implementation({
   blockstoreName,
   storage,
 }: ImplementationOptions): Promise<Depot.Implementation> {
-  const levelBlockstore = new LevelBlockstore(blockstoreName, { prefix: "" });
+  const levelIDB = new IDBBlockstore(blockstoreName);
 
   // Depot tracker
   const dt = await storage.getItem("depot-tracker");
@@ -48,15 +48,15 @@ export async function implementation({
 
   // Blockstore
   const blockstore: Blockstore = {
-    delete: levelBlockstore.delete,
-    deleteMany: levelBlockstore.deleteMany,
-    getAll: levelBlockstore.getAll,
-    getMany: levelBlockstore.getMany,
-    has: levelBlockstore.has,
-    putMany: levelBlockstore.putMany,
+    delete: levelIDB.delete,
+    deleteMany: levelIDB.deleteMany,
+    getAll: levelIDB.getAll,
+    getMany: levelIDB.getMany,
+    has: levelIDB.has,
+    putMany: levelIDB.putMany,
 
     async get(key: CID): Promise<Uint8Array> {
-      if (await levelBlockstore.has(key)) return levelBlockstore.get(key);
+      if (await levelIDB.has(key)) return levelIDB.get(key);
 
       // TODO: Can we use CAR files to get a bunch of blocks at once?
       return fetch(`https://${key.toString()}.ipfs.w3s.link/?format=raw`)
@@ -72,7 +72,7 @@ export async function implementation({
     },
 
     async put(key: CID, value: Uint8Array): Promise<CID> {
-      await levelBlockstore.put(key, value);
+      await levelIDB.put(key, value);
 
       // Depot tracker
       const block: Block = { bytes: value, cid: key.toV1() };
